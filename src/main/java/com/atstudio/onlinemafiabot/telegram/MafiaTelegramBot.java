@@ -16,6 +16,8 @@ import javax.annotation.PostConstruct;
 @Component
 public class MafiaTelegramBot extends TelegramWebhookBot {
 
+    private final static String BOT_PATH = "send-updates-here";
+
     private @Value("${bot.token}")
     String botToken;
     private @Value("${bot.username}")
@@ -27,7 +29,7 @@ public class MafiaTelegramBot extends TelegramWebhookBot {
     @SneakyThrows
     @PostConstruct
     public void init() {
-        setWebhook("https://online-mafia-bot.herokuapp.com/" + botToken, "");
+        setWebhook("https://online-mafia-bot.herokuapp.com/" + BOT_PATH, "");
     }
 
     @Override
@@ -49,7 +51,7 @@ public class MafiaTelegramBot extends TelegramWebhookBot {
 
     @Override
     public String getBotPath() {
-        return botToken;
+        return BOT_PATH;
     }
 
 }
