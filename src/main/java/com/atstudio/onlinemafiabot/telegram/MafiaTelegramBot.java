@@ -1,5 +1,6 @@
 package com.atstudio.onlinemafiabot.telegram;
 
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -7,6 +8,9 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramWebhookBot;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Update;
+
+import javax.annotation.PostConstruct;
+
 
 @Slf4j
 @Component
@@ -19,6 +23,12 @@ public class MafiaTelegramBot extends TelegramWebhookBot {
 
     @Autowired
     private UpdateHandler updateHandler;
+
+    @SneakyThrows
+    @PostConstruct
+    public void init() {
+        setWebhook("https://online-mafia-bot.herokuapp.com/" + botToken, "");
+    }
 
     @Override
     public BotApiMethod onWebhookUpdateReceived(Update update) {
