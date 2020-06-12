@@ -14,7 +14,7 @@ import javax.annotation.PostConstruct;
 @AllArgsConstructor
 public class WebhookController {
 
-    private static final String BOT_PATH = "send-updates-here";
+    private static final String BOT_PATH = "tg-webhook";
 
     private final TelegramWebhookBot bot;
     private final UpdateHandler updateHandler;
