@@ -20,6 +20,7 @@ public class UpdateHandler {
     }
 
     public void handle(Update update) {
+        log.info("Received update from telegram: {}", update);
         for (UpdateProcessor processor: processors) {
             if (processor.willTakeCareOf(update)) {
                 return;

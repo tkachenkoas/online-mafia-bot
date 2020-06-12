@@ -25,7 +25,6 @@ public class MafiaTelegramBot extends TelegramWebhookBot {
 
     @Override
     public BotApiMethod onWebhookUpdateReceived(Update update) {
-        log.info("Received update from telegram: {}", update);
         updateHandler.handle(update);
         return null;
     }
