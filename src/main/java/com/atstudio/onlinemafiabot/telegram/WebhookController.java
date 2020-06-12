@@ -2,6 +2,7 @@ package com.atstudio.onlinemafiabot.telegram;
 
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,8 +27,9 @@ public class WebhookController {
     }
 
     @PostMapping("/callback/" + BOT_PATH)
-    public void handleWebhook(@RequestBody Update update) {
+    public ResponseEntity handleWebhook(@RequestBody Update update) {
         updateHandler.handle(update);
+        return ResponseEntity.ok().build();
     }
 
 }
