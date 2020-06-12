@@ -1,6 +1,5 @@
 package com.atstudio.onlinemafiabot.telegram;
 
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,14 +8,12 @@ import org.telegram.telegrambots.bots.TelegramWebhookBot;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
-import javax.annotation.PostConstruct;
-
 
 @Slf4j
 @Component
 public class MafiaTelegramBot extends TelegramWebhookBot {
 
-    private final static String BOT_PATH = "send-updates-here";
+    private final static String BOT_PATH = "botwebhook";
 
     private @Value("${bot.token}")
     String botToken;
