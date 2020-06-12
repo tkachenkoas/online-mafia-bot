@@ -4,18 +4,28 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.bots.TelegramWebhookBot;
+import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 @Slf4j
 @Component
-public class MafiaTelegramBot extends TelegramLongPollingBot {
+public class MafiaTelegramBot extends TelegramWebhookBot {
 
-    private @Value("${bot.token}") String botToken;
-    private @Value("${bot.username}") String botUserName;
+    private @Value("${bot.token}")
+    String botToken;
+    private @Value("${bot.username}")
+    String botUserName;
 
     @Autowired
     private UpdateHandler updateHandler;
+
+    @Override
+    public BotApiMethod onWebhookUpdateReceived(Update update) {
+        log.info("Received update from telegram: {}", update);
+        updateHandler.handle(update);
+        return null;
+    }
 
     @Override
     public String getBotUsername() {
@@ -28,9 +38,8 @@ public class MafiaTelegramBot extends TelegramLongPollingBot {
     }
 
     @Override
-    public void onUpdateReceived(Update update) {
-        log.info("Received update from telegram: {}", update);
-        updateHandler.handle(update);
+    public String getBotPath() {
+        return "";
     }
 
 }
