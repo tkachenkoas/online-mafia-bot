@@ -1,0 +1,54 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven { url "https://repo1.maven.org/maven2" }
+    }
+    dependencies {
+        classpath "io.spring.gradle:dependency-management-plugin:1.0.3.RELEASE"
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:2.2.6.RELEASE"
+    }
+}
+
+plugins {
+    id 'groovy'
+    id 'java'
+}
+
+
+apply plugin: "io.spring.dependency-management"
+    apply plugin: "org.springframework.boot"
+
+group 'com.atstudio'
+version '1.0'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+task stage(dependsOn: ['build', 'clean'])
+build.mustRunAfter clean
+
+gradle.taskGraph.whenReady {
+    taskGraph ->
+        if (taskGraph.hasTask(stage)) {
+            test.enabled = false
+        }
+}
+
+dependencies {
+    compileOnly "org.projectlombok:lombok:1.18.12"
+    annotationProcessor 'org.projectlombok:lombok:1.18.12'
+
+    implementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo:2.2.0'
+
+    implementation group: 'org.telegram', name: 'telegrambots-spring-boot-starter', version: '4.7'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+    implementation 'org.apache.commons:commons-lang3:3.10'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo:2.2.0'
+    testImplementation 'org.codehaus.groovy:groovy-all:3.0.4'
+}

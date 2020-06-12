@@ -1,0 +1,30 @@
+{
+  "updateId": 414360102,
+  "message": {
+    "messageId": 2,
+    "from": {
+      "id": 163655430,
+      "firstName": "Anton",
+      "isBot": false,
+      "lastName": "Tkachenko",
+      "userName": "tkachenkoas",
+      "languageCode": "en"
+    },
+    "date": 1572772841,
+    "chat": {
+      "id": 163655430,
+      "type": "private",
+      "firstName": "Anton",
+      "lastName": "Tkachenko",
+      "userName": "tkachenkoas"
+    },
+    "text": "PLAIN_MESSAGE_TEXT",
+    "entities": [
+      {
+        "type": "bot_command",
+        "offset": 0,
+        "length": 6
+      }
+    ]
+  }
+}
