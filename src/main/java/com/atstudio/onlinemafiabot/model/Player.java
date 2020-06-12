@@ -15,4 +15,8 @@ public class Player {
     private String name;
     private Long chatId;
 
+    // current game state
+    private String currentGameId;
+    private Integer numberInCurrentGame;
+
 }

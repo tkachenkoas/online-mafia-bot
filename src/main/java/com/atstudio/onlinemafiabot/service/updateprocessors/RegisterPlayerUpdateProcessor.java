@@ -61,6 +61,6 @@ public class RegisterPlayerUpdateProcessor extends AbstractUpdateProcessor {
 
     @Override
     protected boolean applicableFor(Update update) {
-        return StringUtils.contains(getMessageText(update), REGISTER_MESSAGE);
+        return messageContains(update, REGISTER_MESSAGE);
     }
 }

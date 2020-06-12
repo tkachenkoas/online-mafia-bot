@@ -1,6 +1,6 @@
 package com.atstudio.onlinemafiabot.model;
 
-public enum GameRoles {
+public enum GameRole {
 
     CITIZEN,
     KOMISSAR_REX,
