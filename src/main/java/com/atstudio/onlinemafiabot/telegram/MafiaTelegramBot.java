@@ -49,7 +49,7 @@ public class MafiaTelegramBot extends TelegramWebhookBot {
 
     @Override
     public String getBotPath() {
-        return "";
+        return botToken;
     }
 
 }
