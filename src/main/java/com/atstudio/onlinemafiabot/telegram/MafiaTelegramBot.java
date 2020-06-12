@@ -29,7 +29,7 @@ public class MafiaTelegramBot extends TelegramWebhookBot {
     @SneakyThrows
     @PostConstruct
     public void init() {
-        setWebhook("https://online-mafia-bot.herokuapp.com/" + BOT_PATH, "");
+        setWebhook("https://online-mafia-bot.herokuapp.com/callback/" + BOT_PATH, "");
     }
 
     @Override
