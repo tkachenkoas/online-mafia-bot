@@ -26,12 +26,6 @@ public class MafiaTelegramBot extends TelegramWebhookBot {
     @Autowired
     private UpdateHandler updateHandler;
 
-    @SneakyThrows
-    @PostConstruct
-    public void init() {
-        setWebhook("https://online-mafia-bot.herokuapp.com/callback/" + BOT_PATH, "");
-    }
-
     @Override
     public BotApiMethod onWebhookUpdateReceived(Update update) {
         log.info("Received update from telegram: {}", update);
