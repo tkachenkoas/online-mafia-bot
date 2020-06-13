@@ -14,10 +14,10 @@ public class RolesAssigner {
     private static final List<GameRole> ROLES_PRIORITY_ORDER = Arrays.asList(
             DON_CORLEONE,
             KOMISSAR_REX,
-            MAFIA_COMMON,
+            CITIZEN,
             MAFIA_COMMON,
             CITIZEN,
-            CITIZEN,
+            MAFIA_COMMON,
             CITIZEN,
             CITIZEN,
             CITIZEN,
