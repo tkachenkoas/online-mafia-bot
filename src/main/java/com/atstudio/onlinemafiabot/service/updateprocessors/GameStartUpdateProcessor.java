@@ -91,6 +91,7 @@ public class GameStartUpdateProcessor extends AbstractUpdateProcessor {
         return Stream.of(text.split(" "))
                 .filter(StringUtils::isNotBlank)
                 .map(String::trim)
+                .map(login -> login.replace("@", ""))
                 .collect(toList());
     }
 

@@ -149,7 +149,7 @@ class BotIntegrationTest {
             [
                     'chatId': it,
                     'name'  : 'Player' + it,
-                    'login' : '@login' + it
+                    'login' : 'login' + it
             ]
         })
 
