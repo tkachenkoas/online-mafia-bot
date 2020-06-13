@@ -72,6 +72,7 @@ public class GameStartUpdateProcessor extends AbstractUpdateProcessor {
         });
 
         MafiaGame mafiaGame = mafiaGameRepository.save(buildGame(chatId, gameRoles));
+        log.info("Created game: {}", mafiaGame);
 
         playersList.forEach(player -> {
             player.setCurrentGameId(mafiaGame.getGameId());
