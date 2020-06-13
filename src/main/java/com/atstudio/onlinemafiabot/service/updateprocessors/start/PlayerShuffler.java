@@ -23,7 +23,7 @@ public class PlayerShuffler {
 
         Map<Player, Integer> result = new HashMap<>();
         for (int i = 0; i < shuffledPlayers.size(); i++) {
-            result.put(shuffledPlayers.get(i), i);
+            result.put(shuffledPlayers.get(i), i + 1);
         }
         return result;
     }
