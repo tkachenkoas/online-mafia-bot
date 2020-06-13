@@ -17,10 +17,10 @@ public class RolesAssigner {
             CITIZEN,
             MAFIA_COMMON,
             CITIZEN,
+            CITIZEN,
+            CITIZEN,
+            CITIZEN,
             MAFIA_COMMON,
-            CITIZEN,
-            CITIZEN,
-            CITIZEN,
             CITIZEN,
             CITIZEN,
             MAFIA_COMMON
