@@ -39,7 +39,7 @@ class BotIntegrationTest {
             [
                     'chatId': it,
                     'name'  : 'Player' + it,
-                    'login' : '@login' + it
+                    'login' : 'login' + it
             ]
         })
 
@@ -47,9 +47,9 @@ class BotIntegrationTest {
             registerPlayer(it)
         }
 
-        // when -> start game
+        // when -> start gameit
 
-        def startMessage = "/start_game" + players.collect({ it.login }).join(" ")
+        def startMessage = "/start_game" + players.collect({ '@' + it.login }).join(" ")
 
         underTest.handle(getUpdateWithMessage(startMessage))
 
@@ -57,23 +57,23 @@ class BotIntegrationTest {
 
         def sendMessages = executedMethods.collect({ it as SendMessage })
 
-        // 10 x player messages + 1 x chat
-        assert sendMessages.size() == 11
+        // 10 x player messages + 2 x chat
+        assert sendMessages.size() == 12
 
-        assert sendMessages.find({ it.getChatId() == DEFAULT_CHAT }) != null
+        assert sendMessages.findAll({ it.getChatId() == DEFAULT_CHAT as String }).size() == 2
 
         List<String> roles = []
 
-        players.collect({ it.chatId }).each {
-            def userMessage = sendMessages.find({ it.getChatId() == it })
+        players.collect({ it.chatId as String }).each { playerChatId ->
+            def userMessage = sendMessages.find({ it.getChatId() == playerChatId })
             assert userMessage != null
-            roles.add(userMessage.getText())
+            roles.add(userMessage.getText().toLowerCase())
         }
 
-        assert roles.findAll({ it.contains('Don') }).size() == 1
-        assert roles.findAll({ it.contains('Komissar') }).size() == 1
-        assert roles.findAll({ it.contains('Mafia') }).size() == 2
-        assert roles.findAll({ it.contains('Citizen') }).size() == 6
+        assert roles.findAll({ it.contains('дон') }).size() == 1
+        assert roles.findAll({ it.contains('комиссар') }).size() == 1
+        assert roles.findAll({ it.contains('мафия') && it.contains('рядовая') }).size() == 2
+        assert roles.findAll({ it.contains('мирный') }).size() == 6
     }
 
     @Test
@@ -197,6 +197,10 @@ class BotIntegrationTest {
         executedMethods.each { SendMessage message ->
             println(message.getText())
         }
+
+        executedMethods.any({ SendMessage message ->
+            message.getText().contains("кожаные мешки")
+        })
     }
 
     private Object randomNotMafia(Map<Integer, GameRole> mafiaNumbers) {
