@@ -39,7 +39,7 @@ class IntegrationTestConfig {
         return [] as LinkedList
     }
 
-    @Bean
+    //@Bean
     MessageProvider messageProvider() {
         return mock(MessageProvider)
     }

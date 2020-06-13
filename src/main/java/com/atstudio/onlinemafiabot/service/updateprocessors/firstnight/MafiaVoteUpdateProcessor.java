@@ -2,7 +2,7 @@ package com.atstudio.onlinemafiabot.service.updateprocessors.firstnight;
 
 import com.atstudio.onlinemafiabot.model.*;
 import com.atstudio.onlinemafiabot.repository.MafiaGameRepository;
-import com.atstudio.onlinemafiabot.service.gameinfo.EventAdder;
+import com.atstudio.onlinemafiabot.service.gameinfo.EventProcessor;
 import com.atstudio.onlinemafiabot.service.gameinfo.GameInfoProvider;
 import com.atstudio.onlinemafiabot.service.gameinfo.StateValidator;
 import com.atstudio.onlinemafiabot.service.updateprocessors.AbstractUpdateProcessor;
@@ -24,12 +24,12 @@ import static java.util.Arrays.asList;
 @Slf4j
 public class MafiaVoteUpdateProcessor extends AbstractUpdateProcessor {
 
-    private final static String MAFIA_VOTE_COMMAND = "/vote";
+    private final static String MAFIA_KILL_COMMAND = "/kill";
 
     private final MafiaGameRepository mafiaGameRepository;
     private final PlayerAndGameResolver playerAndGameResolver;
     private final StateValidator stateValidator;
-    private final EventAdder eventAdder;
+    private final EventProcessor eventProcessor;
     private final GameInfoProvider gameInfoProvider;
 
     @Override
@@ -37,14 +37,13 @@ public class MafiaVoteUpdateProcessor extends AbstractUpdateProcessor {
         stateValidator.verifyThatChatIsPrivate(update);
         PlayerAndGame playerAndGame = playerAndGameResolver.resolvePlayerAndGame(update);
         MafiaGame mafiaGame = playerAndGame.getMafiaGame();
-        Player player = playerAndGame.getPlayer();
 
         stateValidator.assertThatGamePhaseIs(playerAndGame.getMafiaGame(), MAFIA_HUNT_TIME);
         stateValidator.assertThatUserRoleIsOneOf(playerAndGame, asList(MAFIA_COMMON, DON_CORLEONE));
-        Integer targetPlayerNumber = stateValidator.extractTargetPlayerFromCommand(update, MAFIA_VOTE_COMMAND);
+        Integer targetPlayerNumber = stateValidator.extractTargetPlayerFromCommand(update, MAFIA_KILL_COMMAND);
 
         stateValidator.assertThatUserDidNotPerformAction(playerAndGame, MAFIA_VOTE);
-        eventAdder.addEventToGame(playerAndGame, targetPlayerNumber, MAFIA_VOTE);
+        eventProcessor.addEventToGame(playerAndGame, targetPlayerNumber, MAFIA_VOTE);
 
         checkIfAllMafiaVoted(mafiaGame);
     }
@@ -55,14 +54,13 @@ public class MafiaVoteUpdateProcessor extends AbstractUpdateProcessor {
                 .filter(event -> event.getAction() == MAFIA_VOTE)
                 .count();
         if (mafiaCount == mafiaVotes) {
-            mafiaGame.setPhase(DON_SEARCH_COMISSAR);
-            mafiaGameRepository.save(mafiaGame);
+            eventProcessor.changeGamePhase(mafiaGame, DON_SEARCH_COMISSAR);
             sendMessage(mafiaGame.getChatId(), messageProvider.getMessage("mafia_finished"));
         }
     }
 
     @Override
     protected boolean applicableFor(Update update) {
-        return messageContains(update, MAFIA_VOTE_COMMAND);
+        return messageContains(update, MAFIA_KILL_COMMAND);
     }
 }

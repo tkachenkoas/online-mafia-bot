@@ -1,5 +1,10 @@
 package com.atstudio.onlinemafiabot.telegram
 
+import com.atstudio.onlinemafiabot.model.GameRole
+import com.atstudio.onlinemafiabot.model.MafiaGame
+import com.atstudio.onlinemafiabot.model.Player
+import com.atstudio.onlinemafiabot.repository.MafiaGameRepository
+import com.atstudio.onlinemafiabot.repository.PlayerRepository
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -8,7 +13,6 @@ import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit4.SpringRunner
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage
-import org.telegram.telegrambots.meta.api.objects.Update
 
 import static com.atstudio.onlinemafiabot.telegram.UpdateUtils.getUpdateFromFile
 import static com.atstudio.onlinemafiabot.telegram.UpdateUtils.getUpdateWithMessage
@@ -25,25 +29,6 @@ class BotIntegrationTest {
 
     @Autowired
     List<BotApiMethod> executedMethods
-
-    @Test
-    void testWillShufflePlayers() {
-        Update shuffleUpdate = getUpdateWithMessage("/shuffle Anton Artem Ivan Petrov Nikolaev")
-
-        underTest.handle(shuffleUpdate)
-
-        assert executedMethods.size() == 1
-        def sendMessage = executedMethods.first() as SendMessage
-
-        def text = sendMessage.getText()
-        ['Anton', 'Artem', 'Ivan', 'Petrov', 'Nikolaev'].each {
-            assert text.contains(it)
-        }
-
-        1..5.each {
-            assert text.contains(it.toString())
-        }
-    }
 
     @Test
     void willGiveRoles() {
@@ -85,10 +70,10 @@ class BotIntegrationTest {
             roles.add(userMessage.getText())
         }
 
-        assert roles.findAll({ it.contains('Don')}).size() == 1
-        assert roles.findAll({ it.contains('Komissar')}).size() == 1
-        assert roles.findAll({ it.contains('Mafia')}).size() == 2
-        assert roles.findAll({ it.contains('Citizen')}).size() == 6
+        assert roles.findAll({ it.contains('Don') }).size() == 1
+        assert roles.findAll({ it.contains('Komissar') }).size() == 1
+        assert roles.findAll({ it.contains('Mafia') }).size() == 2
+        assert roles.findAll({ it.contains('Citizen') }).size() == 6
     }
 
     @Test
@@ -123,6 +108,12 @@ class BotIntegrationTest {
         assert sendMessages.first().getText().contains("Unknown")
     }
 
+    @Autowired
+    private MafiaGameRepository gameRepository
+
+    @Autowired
+    private PlayerRepository playerRepository
+
     @Test
     void hugeStupidTest() {
         // prepare players
@@ -139,41 +130,68 @@ class BotIntegrationTest {
             registerPlayer(it)
         }
 
-        // when -> start game
-
+        // start game
         def startMessage = "/start_game" + players.collect({ it.login }).join(" ")
-
         underTest.handle(getUpdateWithMessage(startMessage))
 
-        // then -> verify that each user received a message
+        // night time
+        MafiaGame game = gameRepository.findOneByChatId(DEFAULT_CHAT).get()
+        underTest.handle(getUpdateWithMessage("/first_night"))
 
-        def sendMessages = executedMethods.collect({ it as SendMessage })
-
-        // 10 x player messages + 1 x chat
-        assert sendMessages.size() == 11
-
-        assert sendMessages.find({ it.getChatId() == DEFAULT_CHAT }) != null
-
-        List<String> roles = []
-
-        players.collect({ it.chatId }).each {
-            def userMessage = sendMessages.find({ it.getChatId() == it })
-            assert userMessage != null
-            roles.add(userMessage.getText())
+        // mafia -> find all mafias
+        Map<Integer, GameRole> mafiaNumbers = game.getGameRolesByPlayerNumber().findAll {
+            it.value.isMafia()
         }
 
-        assert roles.findAll({ it.contains('Don')}).size() == 1
-        assert roles.findAll({ it.contains('Komissar')}).size() == 1
-        assert roles.findAll({ it.contains('Mafia')}).size() == 2
-        assert roles.findAll({ it.contains('Citizen')}).size() == 6
+        Map<String, Integer> mafiaLoginToNumber = game.getPlayerNumbersByUser().findAll {
+            mafiaNumbers.containsKey(it.value)
+        }
+
+        def mafiaPlayers = playerRepository.findAllById(mafiaLoginToNumber.keySet())
+
+        // mafia -> make 3 votes
+        def willKill = randomNotMafia(mafiaNumbers)
+        mafiaPlayers.each {
+            executeCommandFromPlayer(it, "/kill ${willKill}")
+        }
+
+        // don -> make the check
+        Player don = mafiaPlayers.find({ mafiaNumbers.get(it.getNumberInCurrentGame()) == GameRole.DON_CORLEONE })
+        executeCommandFromPlayer(don, "/doncheck ${randomNotMafia(mafiaNumbers)}")
+
+        // komissar -> make the check
+        def allPlayers = playerRepository.findAll()
+        def komissar = allPlayers.find {
+            def numberInGame = game.getPlayerNumbersByUser().get(it.login)
+            return game.getGameRolesByPlayerNumber().get(numberInGame) == GameRole.KOMISSAR_REX
+        }
+        executeCommandFromPlayer(komissar, "/komcheck ${new Random().nextInt(10) + 1}")
+
+        executedMethods.each { SendMessage message ->
+            println(message.getText())
+        }
+    }
+
+    private Object randomNotMafia(Map<Integer, GameRole> mafiaNumbers) {
+        def willKill = new Random().nextInt(10) + 1
+        while (mafiaNumbers.keySet().contains(willKill)) {
+            willKill = new Random().nextInt(10) + 1
+        }
+        willKill
     }
 
     def registerPlayer(def player) {
+        executeCommandFromPlayer(player as Player, '/register')
+        executedMethods.clear()
+    }
+
+    def executeCommandFromPlayer(Player player, String command) {
         def update = getUpdateFromFile()
+        update.message.text = command
         update.message.chat.id = player.chatId
+        update.message.chat.type = "private"
         update.message.from.userName = player.login
         update.message.from.firstName = player.name
         underTest.handle(update)
-        executedMethods.clear()
     }
 }

@@ -1,10 +1,10 @@
 package com.atstudio.onlinemafiabot.service.updateprocessors.firstnight;
 
 import com.atstudio.onlinemafiabot.model.*;
-import com.atstudio.onlinemafiabot.service.gameinfo.EventAdder;
+import com.atstudio.onlinemafiabot.service.gameinfo.EventProcessor;
+import com.atstudio.onlinemafiabot.service.gameinfo.StateValidator;
 import com.atstudio.onlinemafiabot.service.updateprocessors.AbstractUpdateProcessor;
 import com.atstudio.onlinemafiabot.service.updateprocessors.PlayerAndGameResolver;
-import com.atstudio.onlinemafiabot.service.gameinfo.StateValidator;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -21,7 +21,7 @@ public class DonCheckUpdateProcessor extends AbstractUpdateProcessor {
 
     private final PlayerAndGameResolver playerAndGameResolver;
     private final StateValidator stateValidator;
-    private final EventAdder eventAdder;
+    private final EventProcessor eventProcessor;
 
     @Override
     protected void process(Update update) {
@@ -32,10 +32,11 @@ public class DonCheckUpdateProcessor extends AbstractUpdateProcessor {
         stateValidator.assertThatUserDidNotPerformAction(playerAndGame, NightAction.DON_CHECH);
 
         Integer targetPlayerNumber = stateValidator.extractTargetPlayerFromCommand(update, DON_CHECK_COMMAND);
-        eventAdder.addEventToGame(playerAndGame, targetPlayerNumber, NightAction.DON_CHECH);
+        eventProcessor.addEventToGame(playerAndGame, targetPlayerNumber, NightAction.DON_CHECH);
 
         notifyDonOnCheckResult(playerAndGame, targetPlayerNumber);
 
+        eventProcessor.changeGamePhase(playerAndGame.getMafiaGame(), GamePhase.COMISSAR_SEARCH_MAFIA);
         notifyOnDonFinishedCheck(playerAndGame.getMafiaGame());
     }
 

@@ -80,15 +80,15 @@ public class GameStartUpdateProcessor extends AbstractUpdateProcessor {
 
     private List<Player> getPlayerListByLogins(List<String> userLogins) {
         return StreamSupport
-                    .stream(playerRepository.findAllById(userLogins).spliterator(), false)
-                    .collect(toList());
+                .stream(playerRepository.findAllById(userLogins).spliterator(), false)
+                .collect(toList());
     }
 
     private List<String> extractUserLogins(String text) {
         return Stream.of(text.split(" "))
-                    .filter(StringUtils::isNotBlank)
-                    .map(String::trim)
-                    .collect(toList());
+                .filter(StringUtils::isNotBlank)
+                .map(String::trim)
+                .collect(toList());
     }
 
     private MafiaGame buildGame(Long chatId, Map<Player, GameRole> gameRoles) {

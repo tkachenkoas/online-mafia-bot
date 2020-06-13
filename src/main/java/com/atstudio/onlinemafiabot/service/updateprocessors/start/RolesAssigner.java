@@ -20,7 +20,8 @@ public class RolesAssigner {
             CITIZEN,
             CITIZEN,
             CITIZEN,
-            MAFIA_COMMON,
+            CITIZEN,
+            CITIZEN,
             CITIZEN,
             MAFIA_COMMON
     );

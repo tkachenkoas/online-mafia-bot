@@ -1,6 +1,7 @@
 package com.atstudio.onlinemafiabot.service.gameinfo;
 
 import com.atstudio.onlinemafiabot.model.MafiaGame;
+import com.atstudio.onlinemafiabot.model.NightAction;
 import com.atstudio.onlinemafiabot.model.NightEvent;
 import com.atstudio.onlinemafiabot.service.MessageProvider;
 import com.atstudio.onlinemafiabot.telegram.TgApiExecutor;
@@ -52,6 +53,9 @@ public class NightResultAnnouncer {
     private Map<Integer, Integer> getVotesByPlayer(MafiaGame mafiaGame) {
         Map<Integer, Integer> result = new HashMap<>();
         for (NightEvent event : mafiaGame.getNightEvents()) {
+            if (event.getAction() != NightAction.MAFIA_VOTE) {
+                continue;
+            }
             result.compute(event.getTargetPlayer(), (key, value) -> value == null ? 1 : value + 1);
         }
         return result;

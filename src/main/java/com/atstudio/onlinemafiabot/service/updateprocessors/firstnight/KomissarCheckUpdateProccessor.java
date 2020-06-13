@@ -3,7 +3,7 @@ package com.atstudio.onlinemafiabot.service.updateprocessors.firstnight;
 import com.atstudio.onlinemafiabot.model.GameRole;
 import com.atstudio.onlinemafiabot.model.MafiaGame;
 import com.atstudio.onlinemafiabot.model.PlayerAndGame;
-import com.atstudio.onlinemafiabot.service.gameinfo.EventAdder;
+import com.atstudio.onlinemafiabot.service.gameinfo.EventProcessor;
 import com.atstudio.onlinemafiabot.service.gameinfo.NightResultAnnouncer;
 import com.atstudio.onlinemafiabot.service.gameinfo.StateValidator;
 import com.atstudio.onlinemafiabot.service.updateprocessors.AbstractUpdateProcessor;
@@ -24,7 +24,7 @@ public class KomissarCheckUpdateProccessor extends AbstractUpdateProcessor {
 
     private final PlayerAndGameResolver playerAndGameResolver;
     private final StateValidator stateValidator;
-    private final EventAdder eventAdder;
+    private final EventProcessor eventProcessor;
     private final NightResultAnnouncer resultAnnouncer;
 
     @Override
@@ -36,7 +36,7 @@ public class KomissarCheckUpdateProccessor extends AbstractUpdateProcessor {
         stateValidator.assertThatUserDidNotPerformAction(playerAndGame, KOMISSAR_CHECK);
 
         Integer targetPlayerNumber = stateValidator.extractTargetPlayerFromCommand(update, KOMISSAR_CHECK_COMMAND);
-        eventAdder.addEventToGame(playerAndGame, targetPlayerNumber, KOMISSAR_CHECK);
+        eventProcessor.addEventToGame(playerAndGame, targetPlayerNumber, KOMISSAR_CHECK);
 
         notifyKomissarOnCheckResult(playerAndGame, targetPlayerNumber);
 
@@ -52,7 +52,7 @@ public class KomissarCheckUpdateProccessor extends AbstractUpdateProcessor {
     }
 
     private void notifyOnKomissarFinishedCheck(MafiaGame mafiaGame) {
-        sendMessage(mafiaGame.getChatId(), messageProvider.getMessage("don_finished"));
+        sendMessage(mafiaGame.getChatId(), messageProvider.getMessage("komissar_finished"));
         resultAnnouncer.announceNightResult(mafiaGame);
     }
 
