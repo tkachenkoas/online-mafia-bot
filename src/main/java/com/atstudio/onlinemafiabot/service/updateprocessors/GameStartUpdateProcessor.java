@@ -11,6 +11,7 @@ import com.atstudio.onlinemafiabot.service.updateprocessors.start.RolesAssigner;
 import com.atstudio.onlinemafiabot.service.updateprocessors.start.RolesInformer;
 import com.atstudio.onlinemafiabot.telegram.TgApiExecutor;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
@@ -32,6 +33,7 @@ import static java.util.stream.Collectors.toList;
 
 @AllArgsConstructor
 @Component
+@Slf4j
 public class GameStartUpdateProcessor extends AbstractUpdateProcessor {
 
     private static final String GAME_START_COMMAND = "/start_game";
@@ -120,6 +122,8 @@ public class GameStartUpdateProcessor extends AbstractUpdateProcessor {
     private void reportUnregisteredUser(List<String> userLogins, List<Player> playersList, Long chatId) {
         Set<String> existing = playersList.stream().map(Player::getLogin).collect(Collectors.toSet());
         Set<String> missing = userLogins.stream().filter(existing::contains).collect(Collectors.toSet());
+        log.info("All logins: " + existing);
+        log.info("Missing logins: " + missing);
         String missingMessage = messageProvider.getMessage(
                 "unregistered_players", String.join(";", missing)
         );
