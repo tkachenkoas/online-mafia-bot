@@ -14,6 +14,6 @@ public class AboutBotUpdateProcessorImpl extends AbstractUpdateProcessor {
 
     @Override
     protected boolean applicableFor(Update update) {
-        return messageContains(update, "/about");
+        return messageContains(update, "/about") || messageContains(update, "/help");
     }
 }
