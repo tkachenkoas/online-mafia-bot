@@ -12,6 +12,8 @@ import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 
+import static org.apache.commons.lang3.StringUtils.defaultString;
+
 @AllArgsConstructor
 @Component
 public class RegisterPlayerUpdateProcessor extends AbstractUpdateProcessor {
@@ -35,7 +37,7 @@ public class RegisterPlayerUpdateProcessor extends AbstractUpdateProcessor {
         Player player = Player.builder()
                 .chatId(chatId)
                 .login(user.getUserName())
-                .name(StringUtils.trim(user.getFirstName() + " " + user.getLastName()))
+                .name(StringUtils.trim(user.getFirstName() + " " + defaultString(user.getLastName())))
                 .build();
 
         repository.save(player);
