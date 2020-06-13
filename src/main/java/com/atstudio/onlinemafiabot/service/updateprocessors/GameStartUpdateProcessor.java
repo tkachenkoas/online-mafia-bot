@@ -47,14 +47,9 @@ public class GameStartUpdateProcessor extends AbstractUpdateProcessor {
     @Override
     protected void process(Update update) {
         String text = getMessageText(update).replace(GAME_START_COMMAND, "");
-        List<String> userLogins = Stream.of(text.split(" "))
-                .filter(StringUtils::isNotBlank)
-                .map(String::trim)
-                .collect(toList());
+        List<String> userLogins = extractUserLogins(text);
 
-        List<Player> playersList = StreamSupport
-                .stream(playerRepository.findAllById(userLogins).spliterator(), false)
-                .collect(toList());
+        List<Player> playersList = getPlayerListByLogins(userLogins);
         Long chatId = getChatId(update);
         if (playersList.size() != userLogins.size()) {
             reportUnregisteredUser(userLogins, playersList, chatId);
@@ -67,38 +62,57 @@ public class GameStartUpdateProcessor extends AbstractUpdateProcessor {
 
         rolesInformer.informUsersOfTheirRoles(gameRoles);
 
-        MafiaGame mafiaGame = mafiaGameRepository.save(buildGame(chatId, gameRoles));
-
         playersList.forEach(player -> {
-            player.setCurrentGameId(mafiaGame.getGameId());
             Integer numberInGame = numberedPlayers.get(player);
             Assert.notNull(numberInGame, "Player number resolving error");
             player.setNumberInCurrentGame(numberInGame);
         });
 
+        MafiaGame mafiaGame = mafiaGameRepository.save(buildGame(chatId, gameRoles));
+
+        playersList.forEach(player -> {
+            player.setCurrentGameId(mafiaGame.getGameId());
+            playerRepository.save(player);
+        });
+
         notifyChatOnGameStart(chatId);
+    }
+
+    private List<Player> getPlayerListByLogins(List<String> userLogins) {
+        return StreamSupport
+                    .stream(playerRepository.findAllById(userLogins).spliterator(), false)
+                    .collect(toList());
+    }
+
+    private List<String> extractUserLogins(String text) {
+        return Stream.of(text.split(" "))
+                    .filter(StringUtils::isNotBlank)
+                    .map(String::trim)
+                    .collect(toList());
     }
 
     private MafiaGame buildGame(Long chatId, Map<Player, GameRole> gameRoles) {
         return MafiaGame.builder()
                 .chatId(chatId)
                 .phase(FIRST_DAY)
-                .gameRolesByUser(gameRolesByUser(gameRoles))
+                .playerNumbersByUser(playerNumberByUser(gameRoles))
+                .gameRolesByPlayerNumber(gameRolesByPlayerNum(gameRoles))
                 .build();
     }
 
     private void notifyChatOnGameStart(Long chatId) {
-        executor.execute(
-                new SendMessage(
-                        chatId,
-                        messageProvider.getMessage("game_start")
-                )
-        );
+        sendMessage(chatId, messageProvider.getMessage("game_start"));
     }
 
-    private Map<String, GameRole> gameRolesByUser(Map<Player, GameRole> gameRoles) {
-        Map<String, GameRole> result = new HashMap<>();
-        gameRoles.forEach((key, value) -> result.put(key.getLogin(), value));
+    private Map<Integer, GameRole> gameRolesByPlayerNum(Map<Player, GameRole> gameRoles) {
+        Map<Integer, GameRole> result = new HashMap<>();
+        gameRoles.forEach((key, value) -> result.put(key.getNumberInCurrentGame(), value));
+        return result;
+    }
+
+    private Map<String, Integer> playerNumberByUser(Map<Player, GameRole> gameRoles) {
+        Map<String, Integer> result = new HashMap<>();
+        gameRoles.forEach((key, value) -> result.put(key.getLogin(), key.getNumberInCurrentGame()));
         return result;
     }
 

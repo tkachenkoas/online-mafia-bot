@@ -12,8 +12,6 @@ import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 
-import static com.atstudio.onlinemafiabot.util.UpdateFieldExtractor.getMessageText;
-
 @AllArgsConstructor
 @Component
 public class RegisterPlayerUpdateProcessor extends AbstractUpdateProcessor {

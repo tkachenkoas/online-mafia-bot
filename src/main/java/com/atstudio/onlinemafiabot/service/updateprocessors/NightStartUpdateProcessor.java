@@ -2,8 +2,6 @@ package com.atstudio.onlinemafiabot.service.updateprocessors;
 
 import com.atstudio.onlinemafiabot.model.MafiaGame;
 import com.atstudio.onlinemafiabot.repository.MafiaGameRepository;
-import com.atstudio.onlinemafiabot.service.MessageProvider;
-import com.atstudio.onlinemafiabot.telegram.TgApiExecutor;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.objects.Chat;

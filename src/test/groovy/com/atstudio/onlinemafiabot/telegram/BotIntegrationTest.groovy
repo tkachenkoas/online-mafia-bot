@@ -123,6 +123,51 @@ class BotIntegrationTest {
         assert sendMessages.first().getText().contains("Unknown")
     }
 
+    @Test
+    void hugeStupidTest() {
+        // prepare players
+
+        def players = (1..10).collect({
+            [
+                    'chatId': it,
+                    'name'  : 'Player' + it,
+                    'login' : '@login' + it
+            ]
+        })
+
+        players.each {
+            registerPlayer(it)
+        }
+
+        // when -> start game
+
+        def startMessage = "/start_game" + players.collect({ it.login }).join(" ")
+
+        underTest.handle(getUpdateWithMessage(startMessage))
+
+        // then -> verify that each user received a message
+
+        def sendMessages = executedMethods.collect({ it as SendMessage })
+
+        // 10 x player messages + 1 x chat
+        assert sendMessages.size() == 11
+
+        assert sendMessages.find({ it.getChatId() == DEFAULT_CHAT }) != null
+
+        List<String> roles = []
+
+        players.collect({ it.chatId }).each {
+            def userMessage = sendMessages.find({ it.getChatId() == it })
+            assert userMessage != null
+            roles.add(userMessage.getText())
+        }
+
+        assert roles.findAll({ it.contains('Don')}).size() == 1
+        assert roles.findAll({ it.contains('Komissar')}).size() == 1
+        assert roles.findAll({ it.contains('Mafia')}).size() == 2
+        assert roles.findAll({ it.contains('Citizen')}).size() == 6
+    }
+
     def registerPlayer(def player) {
         def update = getUpdateFromFile()
         update.message.chat.id = player.chatId

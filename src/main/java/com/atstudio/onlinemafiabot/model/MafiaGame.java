@@ -16,7 +16,8 @@ public class MafiaGame {
     @Id
     private String gameId;
     private Long chatId;
-    private Map<String, GameRole> gameRolesByUser;
+    private Map<Integer, GameRole> gameRolesByPlayerNumber;
+    private Map<String, Integer> playerNumbersByUser;
     private GamePhase phase;
 
     private List<NightEvent> nightEvents;
