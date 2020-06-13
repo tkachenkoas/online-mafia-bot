@@ -108,6 +108,33 @@ class BotIntegrationTest {
         assert sendMessages.first().getText().contains("Unknown")
     }
 
+    @Test
+    void onStartGameWillRemoveAllOther() {
+
+        // prepare players
+
+        def players = (1..10).collect({
+            [
+                    'chatId': it,
+                    'name'  : 'Player' + it,
+                    'login' : '@login' + it
+            ]
+        })
+
+        players.each {
+            registerPlayer(it)
+        }
+
+        // start game
+        def startMessage = "/start_game" + players.collect({ it.login }).join(" ")
+        underTest.handle(getUpdateWithMessage(startMessage))
+
+        // start game again
+        underTest.handle(getUpdateWithMessage(startMessage))
+
+        assert gameRepository.findAll().size() == 1
+    }
+
     @Autowired
     private MafiaGameRepository gameRepository
 

@@ -55,6 +55,7 @@ public class GameStartUpdateProcessor extends AbstractUpdateProcessor {
             reportUnregisteredUser(userLogins, playersList, chatId);
             return;
         }
+        mafiaGameRepository.deleteAllByChatId(chatId);
 
         Map<Player, Integer> numberedPlayers = playerShuffler.shuffleAndNotifyChat(chatId, playersList);
 
