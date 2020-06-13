@@ -121,7 +121,7 @@ public class GameStartUpdateProcessor extends AbstractUpdateProcessor {
 
     private void reportUnregisteredUser(List<String> userLogins, List<Player> playersList, Long chatId) {
         Set<String> existing = playersList.stream().map(Player::getLogin).collect(Collectors.toSet());
-        Set<String> missing = userLogins.stream().filter(existing::contains).collect(Collectors.toSet());
+        Set<String> missing = userLogins.stream().filter(player -> !existing.contains(player)).collect(Collectors.toSet());
         log.info("All logins: " + existing);
         log.info("Missing logins: " + missing);
         String missingMessage = messageProvider.getMessage(

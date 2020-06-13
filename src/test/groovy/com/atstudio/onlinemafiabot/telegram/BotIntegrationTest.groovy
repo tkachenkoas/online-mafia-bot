@@ -105,7 +105,7 @@ class BotIntegrationTest {
 
         // Can't start game with unknown users
         assert sendMessages.size() == 1
-        assert sendMessages.first().getText().contains("Unknown")
+        assert sendMessages.first().getText().contains("unknown")
     }
 
     @Test
